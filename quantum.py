@@ -2,7 +2,7 @@ from qiskit import QuantumCircuit
 from qiskit.primitives import StatevectorSampler
 
 N_QUBITS = 16
-SHOTS = 100
+SHOTS = 1000
 qc = QuantumCircuit(N_QUBITS)
 qc.h(range(N_QUBITS))
 qc.measure_all()
