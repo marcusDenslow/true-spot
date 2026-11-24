@@ -23,16 +23,17 @@ def shuffle(items):
     return items
 
 
-songs = [
-    "sad song",
-    "gym song",
-    "the on i always skip",
-    "banger",
-    "song from 2010",
-    "3am song",
-]
-print(shuffle(songs))
+if __name__ == "__main__":
+    songs = [
+        "sad song",
+        "gym song",
+        "the on i always skip",
+        "banger",
+        "song from 2010",
+        "3am song",
+    ]
+    print(shuffle(songs))
 
-counts = Counter("".join(shuffle("ABC")) for _ in range(6000))
-for order, count in sorted(counts.items()):
-    print(order, count)
+    counts = Counter("".join(shuffle("ABC")) for _ in range(6000))
+    for order, count in sorted(counts.items()):
+        print(order, count)
