@@ -1,21 +1,21 @@
 # true-spot
 
-spotify shuffle isn't actually random (they admitted it in 2014) so i made my own using a real IBM quantum computer. completely normal thing to do
+shuffles a spotify playlist using random bits from a real IBM quantum computer instead of spotify's shuffle, which isn't actually random.
 
 how it works:
 
-- 100 qubits, hadamard on each, measured 1000 times on IBM hardware. 100k random bits
-- von neumann debiasing per qubit, throws away like 75% of them
-- fisher-yates shuffle on whats left, with rejection sampling so theres no modulo bias
-- writes the new order into a spotify playlist
+- 100 qubits with a hadamard on each, measured 1000 times on IBM hardware, gives 100k random bits
+- von neumann debiasing per qubit, which throws away about 75% of them
+- fisher-yates shuffle on the rest, with rejection sampling to avoid modulo bias
+- the new order gets written into a spotify playlist
 
-the quantum part used 2 seconds of QPU time. pay as you go thats $3.20. for a playlist
+the quantum job used 2 seconds of QPU time, which would be $3.20 on IBM's pay as you go plan.
 
 ## running it
 
-you need an IBM Quantum account (free plan is fine) and spotify premium, because their dev API requires it now. yes really
+you need an IBM Quantum account (free plan works) and spotify premium, since the spotify dev API requires it.
 
-`.env`:
+put your keys in `.env`:
 
 ```
 IBM_QUANTUM_TOKEN=
@@ -24,13 +24,13 @@ SPOTIFY_CLIENT_ID=
 SPOTIFY_CLIENT_SECRET=
 ```
 
-set the redirect uri in your spotify app to `http://127.0.0.1:8888/callback`
+add `http://127.0.0.1:8888/callback` as a redirect uri in your spotify app.
 
 ```
 pip install qiskit qiskit-ibm-runtime spotipy python-dotenv
-python submit.py    # sends the job to IBM. locks itself after, delete job_id.txt to send another
+python submit.py    # sends the job to IBM, only runs once unless you delete job_id.txt
 python fetch.py     # downloads the bits into bits.json
-python spotify.py   # change PLAYLIST_NAME first. play with shuffle OFF
+python spotify.py   # set PLAYLIST_NAME first
 ```
 
-my bits.json is in the repo so you can skip the quantum part and just run spotify.py. every run uses fresh bits so you get a new order each time
+play the playlist with shuffle off. bits.json from my run is included, so you can skip the IBM part and just run spotify.py. each run uses new bits, so you get a different order every time.
