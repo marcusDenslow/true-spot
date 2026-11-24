@@ -1,8 +1,21 @@
 from collections import Counter
+from pathlib import Path
 
 from debias import clean
 
-bits = iter(clean)
+OFFSET_FILE = Path("bit_offset.txt")
+posittion = int(OFFSET_FILE.read_text() if OFFSET_FILE.exists() else 0)
+
+
+def next_bit():
+    global posittion
+    posittion += 1
+    return clean[posittion - 1]
+
+
+def save_position():
+    OFFSET_FILE.write_text(str(posittion))
+    print(f"bits used: {posittion} of {len(clean)}")
 
 
 def randwom_below(n):
@@ -10,7 +23,7 @@ def randwom_below(n):
     while True:
         number = 0
         for _ in range(k):
-            number = number * 2 + next(bits)
+            number = number * 2 + next_bit()
         if number < n:
             return number
 

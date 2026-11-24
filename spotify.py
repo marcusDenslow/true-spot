@@ -4,7 +4,8 @@ import spotipy
 from dotenv import load_dotenv
 from spotipy.oauth2 import SpotifyOAuth
 
-from shuffle import shuffle
+from debias import data
+from shuffle import save_position, shuffle
 
 PLAYLIST_NAME = "ah"
 REDIRECT_URI = "http://127.0.0.1:8888/callback"
@@ -21,8 +22,6 @@ sp = spotipy.Spotify(
 )
 
 playlists = sp.current_user_playlists()["items"]
-for p in playlists:
-    print(p["name"])
 
 source = next(p for p in playlists if p["name"] == PLAYLIST_NAME)
 page = sp.playlist_items(source["id"])
@@ -40,13 +39,25 @@ print("quantum order:")
 for t in shuffled[:5]:
     print(f"  {t['name']} - {t['artists'][0]['name']}")
 
-new = sp.current_user_playlist_create(
-    f"quantum shuffle: {source['name']}",
-    public=False,
-    description="shuffled by a real IBM quantum computer. PLAY WITH SHUFFLE OFF",
-)
+
+name = f"quantum shuffle: {source['name']}"
+target = next((p for p in playlists if p["name"] == name), None)
+if target is None:
+    target = sp.current_user_playlist_create(name, public=False)
 
 uris = [t["uri"] for t in shuffled]
-for start in range(0, len(uris), 100):
-    sp.playlist_add_items(new["id"], uris[start : start + 100])
-print(f"created: {new['external_urls']['spotify']}")
+sp.playlist_replace_items(target["id"], uris[:100])
+for start in range(100, len(uris), 100):
+    sp.playlist_add_items(target["id"], uris[start : start + 100])
+save_position()
+
+
+def repeats(songs):
+    ids = [s["artists"][0]["id"] for s in songs]
+    return sum(a == b for a, b in zip(ids, ids[1:]))
+
+
+seconds = data["qpu_seconds"]
+print(f"QPU time: {seconds} s, would have cost ${seconds * 1.60:.2f}")
+print(f"artist repeats: {repeats(tracks)} yours -> {repeats(shuffled)} quantum")
+print(f"playlist: {target['external_urls']['spotify']}")
